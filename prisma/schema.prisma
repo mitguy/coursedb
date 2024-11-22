@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id         Int      @id @unique @default(autoincrement())
+  username   String   @unique
+  createdAt  DateTime @default(now())
+  bio        String?
+  profilepic Bytes?
+
+  Auth        Auth?     @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  Streams     Streams[]
+  FollowsFrom Follows[] @relation("FollowsFrom")
+  FollowsTo   Follows[] @relation("FollowsTo")
+}
+
+model Auth {
+  id       Int    @id @unique @default(autoincrement())
+  username String @unique
+  email    String
+
+  // Users    Users    @relation(fields: [id], references: [id])
+  Passwords Passwords?
+  Tokens    Tokens[]
+  Users     Users[]
+}
+
+model Follows {
+  id         Int      @id @unique @default(autoincrement())
+  from       Int
+  to         Int
+  followedAt DateTime
+
+  FromUser Users @relation("FollowsFrom", fields: [from], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  ToUser   Users @relation("FollowsTo", fields: [to], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Streams {
+  id        Int      @id @unique @default(autoincrement())
+  username  String   @unique
+  live      Boolean
+  title     String
+  startedAt DateTime
+  viewers   Int[]
+
+  Users Users @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Passwords {
+  id     Int     @id @default(autoincrement())
+  userID Int     @unique
+  active Boolean
+  hash   String
+
+  Auth Auth @relation(fields: [userID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Tokens {
+  id    Int    @id @unique @default(autoincrement())
+  token String
+
+  Auth Auth @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
