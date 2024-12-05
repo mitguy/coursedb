@@ -1,60 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-// import { Users, Auth, Prisma } from '@prisma/client';
-import { createBody, deleteBody } from './dto/users.dto';
-import * as bcrypt from 'bcrypt';
+import { Users, Prisma } from '@prisma/client';
+
+const sharp = require('sharp');
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createBody: createBody): Promise<Auth> {
-    return this.prisma.auth.create({
-      data: {
-        username: createBody.username,
-        email: createBody.email,
-        Passwords: {
-          create: {
-            active: true,
-            hash: await bcrypt.hash(createBody.password, Number(process.env.SALT)),
-          }
-        },
-        Users: {
-          create: {
-            username: createBody.username
+  async read(
+    username: string
+  ): Promise<Users | null> {
+    return this.prisma.users.findUnique({
+      where: { username },
+      include: {
+        _count: {
+          select: {
+            FollowsTo: true
           }
         }
       }
     });
   }
 
-  async read(
-    UsersWhereUniqueInput: Prisma.UsersWhereUniqueInput,
-  ): Promise<Users | null> {
-    return this.prisma.users.findUnique({
-      where: UsersWhereUniqueInput,
-    });
-  }
+  async update(
+    where: Prisma.UsersWhereUniqueInput,
+    data: Prisma.UsersUpdateInput,
+  ): Promise<Users> {
+    if (data.profilepic) {
+      data.profilepic = await sharp(data.profilepic as Buffer).resize({width:512, height:512, fit:"cover"}).webp().toBuffer();
+    }
 
-  async update(updateBody: {
-    where: Prisma.UsersWhereUniqueInput;
-    data: Prisma.UsersUpdateInput;
-  }): Promise<Users> {
     return this.prisma.users.update({
-      where: updateBody.where,
-      data: updateBody.data
+      where,
+      data
     });
   }
-
-  async delete(deleteBody: deleteBody): Promise<Auth> {
-    return this.prisma.auth.delete({
-      where: deleteBody.where,
-    });
-  }
-
-  // async delete(where: Prisma.AuthWhereUniqueInput): Promise<Auth> {
-  //   return this.prisma.auth.delete({
-  //     where,
-  //   });
-  // }
 }

@@ -14,8 +14,10 @@ model Users {
   bio        String?
   profilepic Bytes?
 
+  // @@unique([id, username])
+
   Auth        Auth?     @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  Streams     Streams[]
+  // Streams     Streams[]
   FollowsFrom Follows[] @relation("FollowsFrom")
   FollowsTo   Follows[] @relation("FollowsTo")
 }
@@ -27,16 +29,19 @@ model Auth {
 
   // Users    Users    @relation(fields: [id], references: [id])
   Passwords Passwords?
-  Tokens    Tokens[]
   Users     Users[]
+  Streams   Streams[]
 }
 
 model Follows {
   id         Int      @id @unique @default(autoincrement())
   from       Int
   to         Int
-  followedAt DateTime
+  followedAt DateTime @default(now())
 
+  @@unique([from, to])
+
+  // ToStream Streams @relation("StreamsTo", fields: [to], references: [id], onUpdate: Cascade, onDelete: Cascade)
   FromUser Users @relation("FollowsFrom", fields: [from], references: [id], onUpdate: Cascade, onDelete: Cascade)
   ToUser   Users @relation("FollowsTo", fields: [to], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
@@ -44,26 +49,20 @@ model Follows {
 model Streams {
   id        Int      @id @unique @default(autoincrement())
   username  String   @unique
-  live      Boolean
-  title     String
-  startedAt DateTime
-  viewers   Int[]
+  live      Boolean?
+  title     String?
+  startedAt DateTime?
+  viewers   Int?
 
-  Users Users @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  // StreamsTo   Streams[] @relation("StreamsTo")
+  Auth Auth @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  // Users Users @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  // Users Users @relation(fields: [id, username], references: [id, username], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Passwords {
   id     Int     @id @default(autoincrement())
-  userID Int     @unique
-  active Boolean
   hash   String
-
-  Auth Auth @relation(fields: [userID], references: [id], onUpdate: Cascade, onDelete: Cascade)
-}
-
-model Tokens {
-  id    Int    @id @unique @default(autoincrement())
-  token String
 
   Auth Auth @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }

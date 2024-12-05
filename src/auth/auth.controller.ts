@@ -1,13 +1,36 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { Req, Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Auth } from '@prisma/client';
 import { AuthService } from './auth.service';
+import { registerDto, loginDto, tokenDto, emailDto } from './auth.dto';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @HttpCode(HttpStatus.OK)
+  @Post('register')
+  register(
+    @Body() registerDto: registerDto
+  ): Promise<tokenDto> {
+    return this.authService.register(registerDto);
+  }
+
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+  login(
+    @Body() loginDto: loginDto
+  ): Promise<tokenDto>  {
+    return this.authService.login(loginDto);
+  }
+
+  @Post('email')
+  @UseGuards(AuthGuard)
+  email(
+    @Req() req: Request,
+    @Body() emailDto: emailDto,
+  ): Promise<Auth>  {
+    return this.authService.email(
+      { id: req['auth'].sub },
+      { email: emailDto.email },
+    );
   }
 }
