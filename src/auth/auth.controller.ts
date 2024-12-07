@@ -1,7 +1,7 @@
 import { Req, Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { Auth } from '@prisma/client';
+import { Auth, Passwords } from '@prisma/client';
 import { AuthService } from './auth.service';
-import { registerDto, loginDto, tokenDto, emailDto } from './auth.dto';
+import { registerDto, loginDto, tokenDto, passwordDto, emailDto } from './auth.dto';
 import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
@@ -20,6 +20,15 @@ export class AuthController {
     @Body() loginDto: loginDto
   ): Promise<tokenDto>  {
     return this.authService.login(loginDto);
+  }
+
+  @Post('password')
+  @UseGuards(AuthGuard)
+  password(
+    @Req() req: Request,
+    @Body() passwordDto: passwordDto,
+  ): Promise<Passwords>  {
+    return this.authService.password(req['auth'].sub, passwordDto);
   }
 
   @Post('email')

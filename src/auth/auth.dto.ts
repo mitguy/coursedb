@@ -31,6 +31,14 @@ export class tokenDto {
   token: string;
 }
 
+export class passwordDto {
+  @IsStrongPassword()
+  old: string;
+
+  @IsStrongPassword()
+  new: string;
+}
+
 export class emailDto {
   @IsEmail()
   email: string;

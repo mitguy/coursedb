@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
-import { Auth, Prisma } from '@prisma/client';
+import { Auth, Passwords, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { registerDto, loginDto, tokenDto } from './auth.dto';
+import { registerDto, loginDto, tokenDto, passwordDto } from './auth.dto';
 import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
@@ -84,6 +84,24 @@ export class AuthService {
       username: auth.username,
       token,
     } as tokenDto;
+  }
+
+  async password(
+    id: number,
+    passwordDto: passwordDto,
+  ): Promise<Passwords> {
+    const password = await this.prisma.passwords.findUnique({ where: { id }});
+
+    const isAuth = await compare(passwordDto.old, password.hash);
+
+    if (!isAuth) throw new UnauthorizedException(`Wrong password`);
+
+    return this.prisma.passwords.update({
+      where: { id },
+      data: {
+        hash: await hash(passwordDto.new, Number(process.env.SALT))
+      }
+    });
   }
 
   async email(
