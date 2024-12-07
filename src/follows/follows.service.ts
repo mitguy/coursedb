@@ -29,10 +29,15 @@ export class FollowsService {
     from: number
   ): Promise<Follows[] | null> {
     return this.prisma.follows.findMany({
-      where: { from },
+      where: {
+        ToStream: {
+          live: true, // Filter only live streams
+        },
+      },
       include: {
-        /////////////////////////////////////////////////// TO DO: NEW PRISMA SCHEMA THAT CONNECTS FOLLOWS AND STREAMS
-      }
+        ToStream: true, // Include stream details
+        ToUser: true,   // Include user details
+      },
     });
   }
 

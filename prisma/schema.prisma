@@ -39,11 +39,14 @@ model Follows {
   to         Int
   followedAt DateTime @default(now())
 
-  @@unique([from, to])
+  // @@unique([from, to])
 
   // ToStream Streams @relation("StreamsTo", fields: [to], references: [id], onUpdate: Cascade, onDelete: Cascade)
   FromUser Users @relation("FollowsFrom", fields: [from], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  ToUser   Users @relation("FollowsTo", fields: [to], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  ToUser   Users   @relation("FollowsTo", fields: [to], references: [id], onUpdate: Cascade, onDelete: Cascade, map: "Follows_ToUser_fkey")
+  ToStream Streams? @relation("FollowsToStream", fields: [to], references: [id], onUpdate: Cascade, onDelete: Cascade, map: "Follows_ToStream_fkey")
+
+  @@unique([from, to])
 }
 
 model Streams {
@@ -54,6 +57,8 @@ model Streams {
   startedAt DateTime?
   viewers   Int?
 
+  // FollowsTo   Follows[]  @relation("StreamFollows")
+  FollowedBy Follows[] @relation("FollowsToStream")
   // StreamsTo   Streams[] @relation("StreamsTo")
   Auth Auth @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   // Users Users @relation(fields: [id], references: [id], onUpdate: Cascade, onDelete: Cascade)

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Stream</title>
+
+  <!-- Video.js CDN -->
+  <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
+  
+  <!-- Video.js RTMP plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/videojs-flash@2.0.0/dist/videojs-flash.min.js"></script>
+</head>
+<body>
+  <h1>Live Stream for User: ealexandrohin</h1>
+  
+  <!-- Video.js Player -->
+  <video id="liveStream" class="video-js vjs-default-skin" controls preload="auto" width="800" height="450">
+    <source src="rtmp://localhost:8989/live/ealexandrohin" type="rtmp/flv">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Video.js Script -->
+  <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
+  <script>
+    var player = videojs('liveStream', {
+      techOrder: ["flash"],
+      sources: [{
+        src: 'rtmp://localhost:8989/live/ealexandrohin',
+        type: 'rtmp/flv'
+      }]
+    });
+  </script>
+</body>
+</html>

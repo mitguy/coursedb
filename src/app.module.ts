@@ -5,12 +5,13 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { NestjsFormDataModule, MemoryStoredFile } from 'nestjs-form-data';
 import { StreamsModule } from './streams/streams.module';
 import { FollowsModule } from './follows/follows.module';
+import { LiveModule } from './live/live.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, AuthModule, UsersModule, StreamsModule, FollowsModule],
+  imports: [ConfigModule.forRoot(), PrismaModule, AuthModule, UsersModule, StreamsModule, FollowsModule, LiveModule, ChatModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,9 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 
 const multipart = require('@fastify/multipart');
@@ -12,7 +9,7 @@ const multipart = require('@fastify/multipart');
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({ logger: false }),
-    // { logger: ['error', 'warn'] },
+    { logger: ['error', 'warn'] },
   );
 
   app.register(multipart);
@@ -22,4 +19,6 @@ const multipart = require('@fastify/multipart');
   }));
 
   await app.listen(process.env.PORT ?? 3000);
+
+  console.log(await app.getUrl());
 })();

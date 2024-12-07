@@ -3,6 +3,7 @@ import { Streams } from '@prisma/client';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { StreamsService } from './streams.service';
 import { updateDto } from './streams.dto';
+import { ChatGateway } from 'src/chat/chat.gateway';
 
 @Controller('streams')
 @UseGuards(AuthGuard)
@@ -16,7 +17,7 @@ export class StreamsController {
     return this.streamsService.read(req['auth'].username);
   }
 
-  @Get()
+  @Get('live')
   async live(): Promise<Streams[]> {
     return this.streamsService.live();
   }
@@ -27,7 +28,7 @@ export class StreamsController {
   ): Promise<Streams> {
     return this.streamsService.read(username);
   }
-
+  
   @Post('update')
   async update(
     @Req() req: Request,
