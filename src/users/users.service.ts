@@ -8,6 +8,21 @@ const sharp = require('sharp');
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  async get(
+    id: number
+  ): Promise<Users | null> {
+    return this.prisma.users.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            FollowsTo: true
+          }
+        }
+      }
+    });
+  }
+
   async read(
     username: string
   ): Promise<Users | null> {
@@ -28,7 +43,7 @@ export class UsersService {
     data: Prisma.UsersUpdateInput,
   ): Promise<Users> {
     if (data.profilepic) {
-      data.profilepic = await sharp(data.profilepic as Buffer).resize({width:512, height:512, fit:"cover"}).webp().toBuffer();
+      data.profilepic = await sharp(data.profilepic as Buffer).resize({width: Number(process.env.SIZE), height: Number(process.env.SIZE), fit: "contain"}).webp().toBuffer();
     }
 
     return this.prisma.users.update({

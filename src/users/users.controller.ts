@@ -14,7 +14,7 @@ export class UsersController {
   async get(
     @Req() req: Request,
   ): Promise<Users> {
-    return this.usersService.read(req['auth'].sub);
+    return this.usersService.get(req['auth'].sub);
   }
 
   @Get(':username')

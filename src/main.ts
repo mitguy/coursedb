@@ -18,6 +18,8 @@ const multipart = require('@fastify/multipart');
     transform: true,
   }));
 
+  app.enableCors();
+
   await app.listen(process.env.PORT ?? 3000);
 
   console.log(await app.getUrl());

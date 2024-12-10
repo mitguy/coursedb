@@ -31,12 +31,12 @@ export class FollowsService {
     return this.prisma.follows.findMany({
       where: {
         ToStream: {
-          live: true, // Filter only live streams
+          live: true,
         },
       },
       include: {
-        ToStream: true, // Include stream details
-        ToUser: true,   // Include user details
+        ToStream: true,
+        ToUser: true,
       },
     });
   }
