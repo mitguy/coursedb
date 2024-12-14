@@ -7,11 +7,20 @@ import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { StreamsModule } from './streams/streams.module';
 import { FollowsModule } from './follows/follows.module';
-import { LiveModule } from './live/live.module';
 import { ChatModule } from './chat/chat.module';
+import { LiveModule } from './live/live.module';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { WsModule } from './ws/ws.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, AuthModule, UsersModule, StreamsModule, FollowsModule, LiveModule, ChatModule],
+  imports: [
+    ConfigModule.forRoot(),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
+    PrismaModule, AuthModule, UsersModule, StreamsModule, FollowsModule, ChatModule, WsModule, //LiveModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

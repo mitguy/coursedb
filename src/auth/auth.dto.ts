@@ -1,6 +1,16 @@
-import { IsAlphanumeric, IsStrongPassword, IsEmail, MinLength, MaxLength, IsJWT, IsNumber } from 'class-validator';
+import {
+  IsString,
+  MinLength,
+  MaxLength,
+  IsAlphanumeric,
+  IsStrongPassword,
+  IsEmail,
+  IsNumber,
+  IsJWT
+} from 'class-validator';
 
 export class registerDto {
+  @IsString()
   @MinLength(4)
   @MaxLength(16)
   @IsAlphanumeric()
@@ -17,6 +27,7 @@ export class loginDto {
   @IsAlphanumeric()
   username: string;
 
+  @IsStrongPassword()
   password: string;
 }
 

@@ -1,7 +1,9 @@
-import { MaxLength } from 'class-validator';
+import { IsString, MinLength, MaxLength } from 'class-validator';
 import { IsFile, MaxFileSize, HasMimeType, MemoryStoredFile } from 'nestjs-form-data';
 
 export class updateDto {
+  @IsString()
+  @MinLength(0)
   @MaxLength(256)
   bio: string;
 }

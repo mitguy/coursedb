@@ -16,11 +16,19 @@ export class FollowsController {
     return this.followsService.read(req['auth'].sub);
   }
 
-  @Get(':id')
+  @Get(':to')
+  async check(
+    @Req() req: Request,
+    @Param() followsDto: followsDto,
+  ): Promise<Follows | null> {
+    return this.followsService.check(req['auth'].sub, followsDto.to);
+  }
+
+  @Get('count/:id')
   async count(
-    @Param() id: number,
+    @Param() followsDto: followsDto,
   ): Promise<number> {
-    return this.followsService.count(id);
+    return this.followsService.count(followsDto.to);
   }
 
   @Get('live')

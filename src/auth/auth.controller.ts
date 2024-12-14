@@ -9,14 +9,14 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  register(
+  async register(
     @Body() registerDto: registerDto
   ): Promise<tokenDto> {
     return this.authService.register(registerDto);
   }
 
   @Post('login')
-  login(
+  async login(
     @Body() loginDto: loginDto
   ): Promise<tokenDto>  {
     return this.authService.login(loginDto);
@@ -24,7 +24,7 @@ export class AuthController {
 
   @Post('password')
   @UseGuards(AuthGuard)
-  password(
+  async password(
     @Req() req: Request,
     @Body() passwordDto: passwordDto,
   ): Promise<Passwords>  {
@@ -33,7 +33,7 @@ export class AuthController {
 
   @Post('email')
   @UseGuards(AuthGuard)
-  email(
+  async email(
     @Req() req: Request,
     @Body() emailDto: emailDto,
   ): Promise<Auth>  {

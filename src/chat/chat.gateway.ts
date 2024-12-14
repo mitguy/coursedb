@@ -1,24 +1,70 @@
-import { WsResponse, SubscribeMessage, WebSocketGateway, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, WebSocketServer } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io'
+import { Injectable, ValidationPipe, UsePipes, UseFilters, UseGuards } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { 
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  ConnectedSocket,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import { WsGuard } from 'src/ws/ws.guard';
+import { WsFilter } from 'src/ws/ws.filter';
+import { messageDto } from './chat.dto';
 
-@WebSocketGateway()
+@Injectable()
+@UseGuards(WsGuard)
+@UseFilters(WsFilter)
+@UsePipes(new ValidationPipe())
+@WebSocketGateway({ namespace: 'chat', cors: { origin: '*' }})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() server: Server = new Server();
+  constructor(private jwtService: JwtService) {}
 
-  handleConnection(
-    @ConnectedSocket() client: WebSocket
-  ): void {
-    console.log(typeof client);
+  @WebSocketServer() server: Server;
+  
+  async handleConnection(
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    switch (true) {
+      case (!client.handshake.headers.chat):
+      case (!client.handshake.headers.authorization):
+      case (!client.handshake.headers.authorization.split(' ')[1]):
+        client.disconnect();
+      break;
+      default: break;
+    }
+
+    try {
+      await this.jwtService.verifyAsync(client.handshake.headers.authorization.split(' ')[1], { secret: process.env.SECRET });
+
+      client.join(client.handshake.headers.chat);
+    } catch {
+      client.disconnect();
+    }
   }
 
-  handleDisconnect(
-    @ConnectedSocket() client: WebSocket
-  ): void {
-    console.log(typeof client);
+  async handleDisconnect(
+    @ConnectedSocket() client: Socket
+  ): Promise<void> {
+    // console.log(client);
   }
 
   @SubscribeMessage('message')
-  handleMessage(client: WebSocket, payload: any): void {
-    console.log(payload);
+  async handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() messageDto: messageDto,
+  ): Promise<void> {
+    this.server.to(client.handshake.headers.chat).emit('message', JSON.stringify({
+      id: client.handshake.auth.sub,
+      username: client.handshake.auth.username,
+      ...messageDto
+    }));
+
+    // this.server.emit('message', JSON.stringify(messageDto));
+
+    // client.broadcast.emit('message', JSON.stringify(messageDto));
+    // ^^^ this broadcasts to everyone except the one who ???sent the message
   }
 }

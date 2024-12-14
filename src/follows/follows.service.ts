@@ -11,7 +11,22 @@ export class FollowsService {
     from: number
   ): Promise<Follows[] | null> {
     return this.prisma.follows.findMany({
-      where: { from } 
+      where: { from },
+      include: {
+        ToUser: true,
+      },
+    });
+  }
+
+  async check(
+    from: number,
+    to: number,
+  ): Promise<Follows | null> {
+    return this.prisma.follows.findFirst({
+      where: {
+        from, 
+        to,
+      }
     });
   }
 
@@ -30,13 +45,13 @@ export class FollowsService {
   ): Promise<Follows[] | null> {
     return this.prisma.follows.findMany({
       where: {
+        from,
         ToStream: {
           live: true,
         },
       },
       include: {
         ToStream: true,
-        ToUser: true,
       },
     });
   }
@@ -44,7 +59,16 @@ export class FollowsService {
   async create(
     from: number,
     followsDto: followsDto,
-  ): Promise<Follows> {
+  ): Promise<Follows | null> {
+    const followed = await this.prisma.follows.findFirst({
+      where: {
+        from, 
+        to: followsDto.to,
+      }
+    });
+    
+    if (followed) return null;
+
     return this.prisma.follows.create({
       data: {
         from,
