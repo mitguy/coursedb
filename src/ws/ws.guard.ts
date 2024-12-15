@@ -15,7 +15,7 @@ export class WsGuard implements CanActivate {
     if (!token) throw new UnauthorizedException('No token provided');
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, { secret: process.env.SECRET });
+      const payload = await this.jwtService.verifyAsync(token);
       
       request['args'][0].handshake.auth = payload;
     } catch {

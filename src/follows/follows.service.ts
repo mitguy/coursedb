@@ -60,6 +60,8 @@ export class FollowsService {
     from: number,
     followsDto: followsDto,
   ): Promise<Follows | null> {
+    if (from == followsDto.to) return null;
+
     const followed = await this.prisma.follows.findFirst({
       where: {
         from, 

@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 
 const multipart = require('@fastify/multipart');
@@ -12,8 +13,6 @@ const multipart = require('@fastify/multipart');
     { logger: ['error', 'warn'] },
   );
 
-  app.register(multipart);
-
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
     transformOptions: {
@@ -23,7 +22,11 @@ const multipart = require('@fastify/multipart');
 
   app.enableCors();
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.register(multipart);
+
+  app.useWebSocketAdapter(new IoAdapter(app));
+
+  await app.listen(process.env.PORT);
 
   console.log(await app.getUrl());
 })();
