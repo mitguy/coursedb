@@ -1,4 +1,4 @@
-import { Req, Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Req, Body, Controller, Post, UseGuards, Delete, Get } from '@nestjs/common';
 import { Auth, Passwords } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { registerDto, loginDto, tokenDto, passwordDto, emailDto } from './auth.dto';
@@ -18,8 +18,16 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() loginDto: loginDto
-  ): Promise<tokenDto>  {
+  ): Promise<tokenDto> {
     return this.authService.login(loginDto);
+  }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  async get(
+    @Req() req: Request,
+  ): Promise<Auth> {
+    return this.authService.get(req['auth'].sub);
   }
 
   @Post('password')
@@ -27,7 +35,7 @@ export class AuthController {
   async password(
     @Req() req: Request,
     @Body() passwordDto: passwordDto,
-  ): Promise<Passwords>  {
+  ): Promise<Passwords> {
     return this.authService.password(req['auth'].sub, passwordDto);
   }
 
@@ -36,10 +44,21 @@ export class AuthController {
   async email(
     @Req() req: Request,
     @Body() emailDto: emailDto,
-  ): Promise<Auth>  {
+  ): Promise<Auth> {
     return this.authService.email(
       { id: req['auth'].sub },
       { email: emailDto.email },
     );
+  }
+
+  @Delete()
+  @UseGuards(AuthGuard)
+  async delete(
+    @Req() req: Request,
+  ): Promise<Auth> {
+    return this.authService.delete({
+      id: req['auth'].sub,
+      username: req['auth'].username,
+    });
   }
 }

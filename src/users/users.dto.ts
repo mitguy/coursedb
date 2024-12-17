@@ -11,6 +11,6 @@ export class updateDto {
 export class uploadDto {
   @IsFile()
   @MaxFileSize(1e6)
-  @HasMimeType(['image/jpeg', 'image/png', 'image/webp'])
+  @HasMimeType(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
   profilepic: MemoryStoredFile;
 }

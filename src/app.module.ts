@@ -8,7 +8,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { StreamsModule } from './streams/streams.module';
 import { FollowsModule } from './follows/follows.module';
 import { ChatModule } from './chat/chat.module';
-import { LiveModule } from './live/live.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { WsModule } from './ws/ws.module';
 
@@ -19,7 +18,7 @@ import { WsModule } from './ws/ws.module';
       ttl: 60000,
       limit: 100,
     }]),
-    PrismaModule, AuthModule, UsersModule, StreamsModule, FollowsModule, ChatModule, WsModule, //LiveModule
+    PrismaModule, AuthModule, UsersModule, StreamsModule, FollowsModule, ChatModule, WsModule
   ],
   controllers: [AppController],
   providers: [AppService],

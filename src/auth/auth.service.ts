@@ -104,6 +104,14 @@ export class AuthService {
     });
   }
 
+  async get(
+    id: number,
+  ): Promise<Auth> {
+    return this.prisma.auth.findUnique({
+      where: { id },
+    });
+  }
+
   async email(
     where: Prisma.AuthWhereUniqueInput,
     data: Prisma.AuthUpdateInput,
@@ -111,6 +119,14 @@ export class AuthService {
     return this.prisma.auth.update({
       where,
       data,
+    });
+  }
+
+  async delete(
+    where: Prisma.AuthWhereUniqueInput,
+  ): Promise<Auth> {
+    return this.prisma.auth.delete({
+      where,
     });
   }
 }
